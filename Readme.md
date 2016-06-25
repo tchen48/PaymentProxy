@@ -1,4 +1,3 @@
 #Payment Proxy Library
 
-the target of this project is to provide an opensource payment interface for Commercial payment industry or individual merchant
-the final version will be cross platform, but the first version of it will be developed on Windows
+the target of this project is to provide an open source payment interface for Commercial payment industry or individual merchants. The final version will be cross platform, but the current virson is developed under Windows system. This project is using openssl to provide secure tcp connection
