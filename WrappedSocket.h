@@ -10,7 +10,7 @@
 
 struct buffer_st {
 	char * buff;
-	u_int size;
+	unsigned int size;
 
 };
 
