@@ -36,13 +36,13 @@ s.Send(buff);
 
 buff = s.Receive();
 if (buff.buff[0] != ACK) {
-s.CloseConnection();
-return 1;
+	s.CloseConnection();
+	return 1;
 }
 
 buff = s.Receive();
 for (int i = 1; i < buff.size-2; i++) {
-op.RemoveParity(buff.buff[i]);
+	op.RemoveParity(buff.buff[i]);
 }
 s.CloseConnection();
 ```
