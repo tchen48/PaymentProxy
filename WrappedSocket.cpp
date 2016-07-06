@@ -3,8 +3,12 @@
 # include "WrappedSocket.h"
 
 #include <iostream>
-#include <ws2tcpip.h>
-#include <wincrypt.h>
+#ifdef _WIN32
+	#include <ws2tcpip.h>
+	#include <wincrypt.h>
+#else
+	#include <sys/socket.h>
+#endif
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 # include <openssl/conf.h>
@@ -14,7 +18,6 @@
 class WrappedSocket {
 private:
 	bool _isConnected = false;
-	SOCKET _socket;
 	SSL * _ssl;
 	long _timeout;
 	void _initOpenSslLib(void) {
@@ -23,8 +26,9 @@ private:
 		//TODO: need to consider multithreading in here
 		OPENSSL_config(NULL);
 	}
-
+#ifdef _WIN32
 	int _createSocketAndConnect(char* host, char* port) {
+		SOCKET _socket;
 		WSADATA wsadata;
 		if (WSAStartup(0x0202, &wsadata) || wsadata.wVersion != 0x0202) {
 			WSACleanup();
@@ -118,6 +122,8 @@ public:
 		auto err = SSL_connect(_ssl);
 		ERR_print_errors_fp(stdout);
 	}
+#else
+#endif
 
 	buffer_st Receive()
 	{
@@ -128,7 +134,7 @@ public:
 		//MAY NEED TO IMPLEMENTING LOCKING HERE BUT IF ONLY ONE INSTANCE MAY NOT NEED TO
 		if (!_isConnected)
 			return buffInfo;
-		auto length = SSL_read(_ssl, buffer, sizeof(buffer));
+		int length = SSL_read(_ssl, buffer, sizeof(buffer));
 		if (length <= 0)
 			return buffInfo;
 		buffInfo.buff = buffer;
@@ -141,7 +147,7 @@ public:
 	{
 		if (!_isConnected)
 			return -1;
-		auto length = SSL_write(_ssl, buffInfo.buff, buffInfo.size);
+		int length = SSL_write(_ssl, buffInfo.buff, buffInfo.size);
 		return length;
 
 	}
